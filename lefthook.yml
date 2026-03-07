@@ -1,0 +1,13 @@
+commit-msg:
+  run: bunx commitlint --edit
+
+pre-commit:
+  parallel: true
+  commands:
+    bun-lint:
+      run: bun run lint
+    composer-lint:
+      run: composer lint
+
+pre-push:
+  run: composer test
