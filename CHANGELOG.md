@@ -11,4 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial commit
 
+### Changed
+
+- Update execute-phase workflow to mark completed only, add Build Todo List step
+
 
