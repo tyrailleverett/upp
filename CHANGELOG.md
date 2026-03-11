@@ -18,5 +18,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Maintenance
 
 - Update configuration and commands
+- Remove duplicate .claude/skills directory
 
 
