@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Initial commit
+- Add auto-detection of next phase to execute-phase and verify-phase
 
 ### Changed
 
