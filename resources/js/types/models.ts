@@ -40,3 +40,30 @@ export interface Site {
   components?: Component[];
   components_count?: number;
 }
+
+export type IncidentStatus =
+  | "investigating"
+  | "identified"
+  | "monitoring"
+  | "resolved";
+
+export interface IncidentUpdate {
+  id: number;
+  incident_id: number;
+  status: IncidentStatus;
+  message: string;
+  created_at: string;
+}
+
+export interface Incident {
+  id: number;
+  site_id: number;
+  title: string;
+  status: IncidentStatus;
+  postmortem: string | null;
+  resolved_at: string | null;
+  created_at: string;
+  updated_at: string;
+  components?: Component[];
+  updates?: IncidentUpdate[];
+}

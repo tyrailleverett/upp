@@ -18,7 +18,9 @@ final class AccountDeletedMail extends Mailable implements Previewable, ShouldQu
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public User $user) {}
+    public function __construct(public User $user)
+    {
+    }
 
     /**
      * Create a representative instance of this mailable for preview purposes.

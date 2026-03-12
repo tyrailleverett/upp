@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 final class Component extends Model
@@ -40,6 +41,12 @@ final class Component extends Model
     public function dailyUptimes(): HasMany
     {
         return $this->hasMany(ComponentDailyUptime::class);
+    }
+
+    /** @return BelongsToMany<Incident, $this> */
+    public function incidents(): BelongsToMany
+    {
+        return $this->belongsToMany(Incident::class, 'incident_component');
     }
 
     /** @param Builder<Component> $query */
