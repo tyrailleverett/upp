@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\ComponentStatus;
 use App\Enums\SiteVisibility;
 use App\Models\Component;
+use App\Models\MaintenanceWindow;
 use App\Models\Site;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -102,6 +103,16 @@ it('returns operational when no components exist', function (): void {
     $site = Site::factory()->create();
 
     expect($site->overallStatus())->toBe(ComponentStatus::Operational);
+});
+
+it('computes overall status using active maintenance overlays', function (): void {
+    $site = Site::factory()->create();
+    $component = Component::factory()->for($site)->create(['status' => ComponentStatus::Operational]);
+
+    MaintenanceWindow::factory()->active()->for($site)->create()
+        ->components()->attach([$component->id]);
+
+    expect($site->overallStatus())->toBe(ComponentStatus::UnderMaintenance);
 });
 
 it('scopes to published sites', function (): void {

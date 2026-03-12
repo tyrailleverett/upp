@@ -13,3 +13,4 @@ Artisan::command('inspire', function (): void {
 Schedule::command('disposable:update')->daily();
 Schedule::command('analytics:finalize-sessions')->hourly();
 Schedule::command('analytics:prune')->daily();
+Schedule::command('maintenance:complete-expired')->everyMinute();

@@ -67,3 +67,16 @@ export interface Incident {
   components?: Component[];
   updates?: IncidentUpdate[];
 }
+
+export interface MaintenanceWindow {
+  id: number;
+  site_id: number;
+  title: string;
+  description: string | null;
+  scheduled_at: string;
+  ends_at: string;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
+  components?: Component[];
+}

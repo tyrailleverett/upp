@@ -21,7 +21,7 @@ final class UpdateComponentStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['required', Rule::enum(ComponentStatus::class)],
+            'status' => ['required', Rule::enum(ComponentStatus::class)->except([ComponentStatus::UnderMaintenance])],
         ];
     }
 }

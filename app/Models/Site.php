@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\ComponentStatus;
 use App\Enums\SiteVisibility;
+use App\Services\EffectiveStatusService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -56,6 +57,12 @@ final class Site extends Model
         return $this->hasMany(Incident::class);
     }
 
+    /** @return HasMany<MaintenanceWindow, $this> */
+    public function maintenanceWindows(): HasMany
+    {
+        return $this->hasMany(MaintenanceWindow::class);
+    }
+
     public function isPublished(): bool
     {
         return $this->visibility === SiteVisibility::Published;
@@ -73,21 +80,7 @@ final class Site extends Model
 
     public function overallStatus(): ComponentStatus
     {
-        $components = $this->relationLoaded('components')
-            ? $this->components
-            : $this->components()->get(['status']);
-
-        if ($components->isEmpty()) {
-            return ComponentStatus::Operational;
-        }
-
-        return $components
-            ->reduce(
-                fn (ComponentStatus $worstStatus, Component $component) => $component->status->severity() > $worstStatus->severity()
-                    ? $component->status
-                    : $worstStatus,
-                ComponentStatus::Operational,
-            );
+        return app(EffectiveStatusService::class)->resolveOverallSiteStatus($this);
     }
 
     /** @param Builder<Site> $query */

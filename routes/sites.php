@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Sites\CompleteMaintenanceController;
 use App\Http\Controllers\Sites\ComponentController;
 use App\Http\Controllers\Sites\ComponentStatusController;
 use App\Http\Controllers\Sites\IncidentController;
 use App\Http\Controllers\Sites\IncidentUpdateController;
+use App\Http\Controllers\Sites\MaintenanceWindowController;
 use App\Http\Controllers\Sites\SiteController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,4 +40,13 @@ Route::scopeBindings()
         Route::delete('{site}/incidents/{incident}', [IncidentController::class, 'destroy'])->name('incidents.destroy');
         Route::post('{site}/incidents/{incident}/updates', [IncidentUpdateController::class, 'store'])->name('incidents.updates.store');
         Route::post('{site}/incidents/{incident}/resolve', [IncidentUpdateController::class, 'resolve'])->name('incidents.resolve');
+
+        Route::get('{site}/maintenance', [MaintenanceWindowController::class, 'index'])->name('maintenance.index');
+        Route::get('{site}/maintenance/create', [MaintenanceWindowController::class, 'create'])->name('maintenance.create');
+        Route::post('{site}/maintenance', [MaintenanceWindowController::class, 'store'])->name('maintenance.store');
+        Route::get('{site}/maintenance/{maintenanceWindow}', [MaintenanceWindowController::class, 'show'])->name('maintenance.show');
+        Route::get('{site}/maintenance/{maintenanceWindow}/edit', [MaintenanceWindowController::class, 'edit'])->name('maintenance.edit');
+        Route::put('{site}/maintenance/{maintenanceWindow}', [MaintenanceWindowController::class, 'update'])->name('maintenance.update');
+        Route::delete('{site}/maintenance/{maintenanceWindow}', [MaintenanceWindowController::class, 'destroy'])->name('maintenance.destroy');
+        Route::post('{site}/maintenance/{maintenanceWindow}/complete', CompleteMaintenanceController::class)->name('maintenance.complete');
     });
