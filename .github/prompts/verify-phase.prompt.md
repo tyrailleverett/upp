@@ -68,12 +68,24 @@ For each `## - [ ]` section in the plan, in order:
 
 After all individual sections are verified, run the **Cross-Section Checks** described in @.claude/skills/verify-phase/references/section-verification.md to confirm sections integrate correctly.
 
-### Step 3: Run Test Suite
+### Step 3: Code Review
+
+Run a comprehensive code review of all uncommitted changes to ensure code quality, security, and adherence to project standards.
+
+Follow the detailed instructions in [code-review.prompt.md](./code-review.prompt.md) to:
+1. Collect all changed files
+2. Apply each review category (PHP standards, security, performance, architecture, testing)
+3. Report findings with severity ratings
+4. Record the verdict: Approved, Approved with suggestions, or Changes required
+
+If the code review returns **Changes required**, address all Critical and High findings before proceeding to Step 4. If only Medium, Low, or Suggestion findings exist, proceed to Step 4 but note them in the final report.
+
+### Step 4: Run Test Suite
 
 1. Run the full test suite: `composer test`
 2. Record the output, pass/fail result, and any failure details
 
-### Step 4: Auto-Fix Issues
+### Step 5: Auto-Fix Issues
 
 1. Run Pint to auto-fix any formatting violations: `vendor/bin/pint --dirty --format agent`
 2. For each DEVIATION or MISSING finding from Step 2, apply the required fix to the relevant file
@@ -84,7 +96,7 @@ After all individual sections are verified, run the **Cross-Section Checks** des
    - Re-run: `composer test`
 5. If tests are still failing after 3 attempts, stop and report to the user — **do not push**
 
-### Step 5: Finalize
+### Step 6: Finalize
 
 Follow the **Finalization** procedure in @.claude/skills/execute-phase/references/git-workflow.md:
 
@@ -96,7 +108,7 @@ Follow the **Finalization** procedure in @.claude/skills/execute-phase/reference
 6. Delete the local feature branch: `git branch -D <branch-name>`
 7. Delete the remote feature branch if it exists: `git push origin --delete <branch-name>`
 
-### Step 6: Report to User
+### Step 7: Report to User
 
 Follow @.claude/skills/verify-phase/references/report-format.md for the report template.
 

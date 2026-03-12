@@ -87,7 +87,7 @@ After all individual sections are verified, run the **Cross-Section Checks** des
 
 ### Step 5: Code Review
 
-Perform a thorough code review of all staged and changed files using the guidelines in @.opencode/commands/code-review.md. This includes:
+Perform a thorough code review of all staged and changed files using the guidelines in @code-review.md. This includes:
 
 - All PHP and code standards checks
 - Security, performance, and architecture reviews
