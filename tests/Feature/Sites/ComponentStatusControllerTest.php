@@ -57,6 +57,19 @@ it('rejects invalid status values', function (): void {
     $response->assertSessionHasErrors(['status']);
 });
 
+it('rejects setting component status to under maintenance directly', function (): void {
+    $user = User::factory()->create();
+    $site = Site::factory()->for($user)->create();
+    $component = Component::factory()->for($site)->create();
+
+    $response = $this->actingAs($user)->put(
+        route('sites.components.status.update', [$site, $component]),
+        ['status' => ComponentStatus::UnderMaintenance->value]
+    );
+
+    $response->assertSessionHasErrors(['status']);
+});
+
 it('prevents updating status of another users component', function (): void {
     $user = User::factory()->create();
     $otherUser = User::factory()->create();

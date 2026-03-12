@@ -49,6 +49,12 @@ final class Component extends Model
         return $this->belongsToMany(Incident::class, 'incident_component');
     }
 
+    /** @return BelongsToMany<MaintenanceWindow, $this> */
+    public function maintenanceWindows(): BelongsToMany
+    {
+        return $this->belongsToMany(MaintenanceWindow::class, 'maintenance_component');
+    }
+
     /** @param Builder<Component> $query */
     public function scopeOrdered(Builder $query): void
     {

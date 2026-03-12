@@ -20,7 +20,6 @@ const statusOptions: { value: ComponentStatus; label: string }[] = [
   { value: "degraded_performance", label: "Degraded Performance" },
   { value: "partial_outage", label: "Partial Outage" },
   { value: "major_outage", label: "Major Outage" },
-  { value: "under_maintenance", label: "Under Maintenance" },
 ];
 
 export function ComponentStatusSelect({ component, siteSlug }: Props) {
