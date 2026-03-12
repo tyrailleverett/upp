@@ -14,7 +14,7 @@ This phase delivers the public-facing status page — the visitor-facing product
 
 ---
 
-## - [ ] 1. Middleware: ResolveSiteFromSubdomain
+## - [x] 1. Middleware: ResolveSiteFromSubdomain
 
 **`app/Http/Middleware/ResolveSiteFromSubdomain.php`**
 
@@ -56,7 +56,7 @@ sequenceDiagram
 
 ---
 
-## - [ ] 2. Events
+## - [x] 2. Events
 
 Create broadcasting events for real-time status page updates. All events implement `ShouldBroadcastNow` for immediate delivery (not queued, since status updates should be near-instant).
 
@@ -111,7 +111,7 @@ Create broadcasting events for real-time status page updates. All events impleme
 
 ---
 
-## - [ ] 3. Dispatch Events from Actions
+## - [x] 3. Dispatch Events from Actions
 
 Update Phase 1, 2, and 3 Actions to dispatch the broadcasting events.
 
@@ -153,7 +153,7 @@ Update Phase 1, 2, and 3 Actions to dispatch the broadcasting events.
 
 ---
 
-## - [ ] 4. Broadcasting Channel Configuration
+## - [x] 4. Broadcasting Channel Configuration
 
 **`routes/channels.php`** (create if it doesn't exist)
 
@@ -165,7 +165,7 @@ Ensure the Reverb configuration is present in `config/broadcasting.php`. The `BR
 
 ---
 
-## - [ ] 5. Service: UptimeCalculationService
+## - [x] 5. Service: UptimeCalculationService
 
 **`app/Services/UptimeCalculationService.php`**
 
@@ -188,7 +188,7 @@ Computes daily uptime rollups from `ComponentStatusLog` entries.
 
 ---
 
-## - [ ] 6. Job & Command: ComputeDailyUptime
+## - [x] 6. Job & Command: ComputeDailyUptime
 
 **`app/Jobs/ComputeDailyUptimeJob.php`**
 
@@ -213,7 +213,7 @@ Computes daily uptime rollups from `ComponentStatusLog` entries.
 
 ---
 
-## - [ ] 7. Eloquent API Resources
+## - [x] 7. Eloquent API Resources
 
 Create API resources for the public read endpoints.
 
@@ -249,7 +249,7 @@ Create API resources for the public read endpoints.
 
 ---
 
-## - [ ] 8. Controllers
+## - [x] 8. Controllers
 
 **`app/Http/Controllers/StatusPage/PublicStatusPageController.php`**
 
@@ -291,7 +291,7 @@ Serves public read-only JSON API endpoints.
 
 ---
 
-## - [ ] 9. Routes
+## - [x] 9. Routes
 
 **Status Page Routes (subdomain-based)**
 
@@ -332,7 +332,7 @@ Apply rate limiting middleware: `throttle:60,1` (60 requests per minute).
 
 ---
 
-## - [ ] 10. Config & Environment
+## - [x] 10. Config & Environment
 
 **`config/app.php`** — add:
 - `'domain' => env('APP_DOMAIN', 'statuskit.app')`
@@ -343,7 +343,7 @@ Apply rate limiting middleware: `throttle:60,1` (60 requests per minute).
 
 ---
 
-## - [ ] 11. TypeScript Types
+## - [x] 11. TypeScript Types
 
 Add to `resources/js/types/models.ts`:
 
@@ -357,7 +357,7 @@ Add to `resources/js/types/models.ts`:
 
 ---
 
-## - [ ] 12. Frontend: Status Page Layout
+## - [x] 12. Frontend: Status Page Layout
 
 **`resources/js/layouts/status-page-layout.tsx`**
 
@@ -382,7 +382,7 @@ The following screenshots in `art/` show exactly how the public status page shou
 
 ---
 
-## - [ ] 13. Frontend Pages
+## - [x] 13. Frontend Pages
 
 **`resources/js/pages/status-page/index.tsx`**
 
@@ -429,7 +429,7 @@ Page sections (top to bottom):
 
 ---
 
-## - [ ] 14. Frontend Components
+## - [x] 14. Frontend Components
 
 **`resources/js/components/status-page/overall-status-banner.tsx`**
 
@@ -466,7 +466,7 @@ Page sections (top to bottom):
 
 ---
 
-## - [ ] 15. Real-Time Integration
+## - [x] 15. Real-Time Integration
 
 The public status page connects to a Reverb WebSocket channel on load for real-time updates.
 
@@ -487,7 +487,7 @@ Use Laravel Echo (already available via the `laravel-echo` npm package) for chan
 
 ---
 
-## - [ ] 16. Tests
+## - [x] 16. Tests
 
 ### Unit Tests
 
@@ -560,7 +560,7 @@ Use Laravel Echo (already available via the `laravel-echo` npm package) for chan
 
 ---
 
-## - [ ] 17. Data Flow Diagram
+## - [x] 17. Data Flow Diagram
 
 ```mermaid
 sequenceDiagram

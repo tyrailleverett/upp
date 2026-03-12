@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Sites;
 
+use App\Events\MaintenanceCompleted;
 use App\Models\MaintenanceWindow;
 use Illuminate\Validation\ValidationException;
 
@@ -19,6 +20,10 @@ final class CompleteMaintenanceAction
 
         $window->completed_at = now();
         $window->save();
+
+        $window->load(['site', 'components']);
+
+        MaintenanceCompleted::dispatch($window);
 
         return $window->refresh();
     }

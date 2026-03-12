@@ -29,7 +29,7 @@ final class ComponentDailyUptime extends Model
     protected function casts(): array
     {
         return [
-            'date' => 'date',
+            'date' => 'date:Y-m-d',
             'uptime_percentage' => 'decimal:2',
             'minutes_operational' => 'integer',
             'minutes_excluded_for_maintenance' => 'integer',

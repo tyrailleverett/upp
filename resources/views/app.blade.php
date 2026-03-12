@@ -25,6 +25,10 @@
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
         <link rel="manifest" href="/manifest.json">
         <meta name="theme-color" content="#1b1b1f">
+        <meta name="reverb-app-key" content="{{ config('broadcasting.connections.reverb.key') }}">
+        <meta name="reverb-host" content="{{ config('broadcasting.connections.reverb.options.host') }}">
+        <meta name="reverb-port" content="{{ config('broadcasting.connections.reverb.options.port') }}">
+        <meta name="reverb-scheme" content="{{ config('broadcasting.connections.reverb.options.scheme') }}">
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />

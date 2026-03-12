@@ -6,19 +6,43 @@ use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Events\DiagnosingHealth;
+use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Sentry\Laravel\Integration;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
-        health: '/up',
-        then: function (): void {
+        channels: __DIR__.'/../routes/channels.php',
+        using: function (): void {
+            // Domain-constrained routes MUST be registered before web routes
+            // so they take priority in Laravel's first-match routing.
+            Route::middleware(['web', 'resolve-site'])
+                ->domain('{slug}.'.config('app.domain', 'statuskit.app'))
+                ->group(base_path('routes/status-page.php'));
+
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/api.php'));
+
+            PreventRequestsDuringMaintenance::except('/up');
+
+            Route::get('/up', function (): Response {
+                Event::dispatch(new DiagnosingHealth);
+
+                return response('');
+            });
+
+            Route::middleware('web')
+                ->group(base_path('routes/web.php'));
+
             if (app()->environment('local', 'testing')) {
                 Route::middleware('web')
                     ->group(base_path('routes/dev.php'));
@@ -39,12 +63,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'two-factor-confirmed' => App\Http\Middleware\EnsureTwoFactorIsConfirmed::class,
+            'resolve-site' => App\Http\Middleware\ResolveSiteFromSubdomain::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         Integration::handles($exceptions);
 
-        $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
+        $exceptions->respond(function (SymfonyResponse $response, Throwable $exception, Request $request) {
             if (! app()->environment(['local', 'testing']) && in_array($response->getStatusCode(), [500, 503, 404, 403])) {
                 return Inertia::render('error-page', ['status' => $response->getStatusCode()])
                     ->toResponse($request)
