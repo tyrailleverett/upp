@@ -63,6 +63,14 @@ final class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * @return HasMany<Site, $this>
+     */
+    public function sites(): HasMany
+    {
+        return $this->hasMany(Site::class);
+    }
+
+    /**
      * Determine if the user has set a password.
      */
     public function hasPassword(): bool
