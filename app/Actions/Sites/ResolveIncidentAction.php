@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Sites;
 
 use App\Enums\IncidentStatus;
+use App\Events\IncidentResolved;
 use App\Models\Incident;
 
 final class ResolveIncidentAction
@@ -24,6 +25,10 @@ final class ResolveIncidentAction
             'resolved_at' => now(),
             'postmortem' => $data['postmortem'] ?? null,
         ]);
+
+        $incident->load('site');
+
+        IncidentResolved::dispatch($incident);
 
         return $incident->refresh();
     }

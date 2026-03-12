@@ -14,3 +14,5 @@ Schedule::command('disposable:update')->daily();
 Schedule::command('analytics:finalize-sessions')->hourly();
 Schedule::command('analytics:prune')->daily();
 Schedule::command('maintenance:complete-expired')->everyMinute();
+Schedule::command('maintenance:start-scheduled')->everyMinute();
+Schedule::command('uptime:compute-daily')->dailyAt('00:15');

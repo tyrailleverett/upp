@@ -80,3 +80,37 @@ export interface MaintenanceWindow {
   updated_at: string;
   components?: Component[];
 }
+
+export interface PublicSiteStatus {
+  name: string;
+  slug: string;
+  description: string | null;
+  overall_status: ComponentStatus;
+  components: PublicComponent[];
+  active_incidents_count: number;
+  meta_title: string | null;
+  meta_description: string | null;
+  accent_color: string | null;
+  logo_path: string | null;
+  favicon_path: string | null;
+}
+
+export interface PublicComponent {
+  id: number;
+  name: string;
+  description: string | null;
+  group: string | null;
+  status: ComponentStatus;
+  sort_order: number;
+}
+
+export interface UptimeDay {
+  date: string;
+  uptime_percentage: number;
+}
+
+export interface ComponentUptime {
+  component_id: number;
+  component_name: string;
+  days: UptimeDay[];
+}

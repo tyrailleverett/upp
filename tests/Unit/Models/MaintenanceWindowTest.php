@@ -19,6 +19,7 @@ it('has correct fillable attributes', function (): void {
         'scheduled_at',
         'ends_at',
         'completed_at',
+        'started_notified_at',
     ]);
 });
 

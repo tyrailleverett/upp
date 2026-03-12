@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Sites;
 
+use App\Events\MaintenanceScheduled;
 use App\Models\MaintenanceWindow;
 use App\Models\Site;
 
@@ -22,6 +23,10 @@ final class ScheduleMaintenanceAction
         ]);
 
         $window->components()->attach($data['component_ids']);
+
+        $window->load(['site', 'components']);
+
+        MaintenanceScheduled::dispatch($window);
 
         return $window;
     }

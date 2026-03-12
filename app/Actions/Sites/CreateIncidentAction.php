@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Sites;
 
+use App\Events\IncidentCreated;
 use App\Models\Incident;
 use App\Models\Site;
 
@@ -25,6 +26,10 @@ final class CreateIncidentAction
             'status' => $data['status'],
             'message' => $data['message'],
         ]);
+
+        $incident->load(['site', 'components', 'updates']);
+
+        IncidentCreated::dispatch($incident);
 
         return $incident;
     }

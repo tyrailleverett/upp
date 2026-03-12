@@ -21,6 +21,7 @@ final class MaintenanceWindow extends Model
         'scheduled_at',
         'ends_at',
         'completed_at',
+        'started_notified_at',
     ];
 
     /** @return BelongsTo<Site, $this> */
@@ -87,6 +88,7 @@ final class MaintenanceWindow extends Model
             'scheduled_at' => 'datetime',
             'ends_at' => 'datetime',
             'completed_at' => 'datetime',
+            'started_notified_at' => 'datetime',
         ];
     }
 }
