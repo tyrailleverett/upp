@@ -14,7 +14,7 @@ This phase builds the foundational data layer for StatusKit — Sites and Compon
 
 ---
 
-## - [ ] 1. Enums
+## - [x] 1. Enums
 
 **`app/Enums/SiteVisibility.php`**
 
@@ -47,7 +47,7 @@ Add a `severity(): int` method returning a numeric severity (0 for Operational t
 
 ---
 
-## - [ ] 2. Migrations
+## - [x] 2. Migrations
 
 Create four migrations in this order so foreign keys resolve correctly. Use `php artisan make:migration` for each.
 
@@ -116,7 +116,7 @@ Add a `unique(['component_id', 'date'])` composite index — one record per comp
 
 ---
 
-## - [ ] 3. Models
+## - [x] 3. Models
 
 **`app/Models/Site.php`**
 
@@ -186,7 +186,7 @@ Add a `unique(['component_id', 'date'])` composite index — one record per comp
 
 ---
 
-## - [ ] 4. Factories
+## - [x] 4. Factories
 
 **`database/factories/SiteFactory.php`**
 
@@ -237,7 +237,7 @@ Definition:
 
 ---
 
-## - [ ] 5. Seeders
+## - [x] 5. Seeders
 
 **`database/seeders/SiteSeeder.php`**
 
@@ -251,7 +251,7 @@ Register in `DatabaseSeeder.php` so it runs after the existing UserSeeder (or cr
 
 ---
 
-## - [ ] 6. Form Requests
+## - [x] 6. Form Requests
 
 All form requests use array-style validation rules and `authorize(): bool` returning `true` (authorization handled by policies in the controller).
 
@@ -298,7 +298,7 @@ Same as `StoreComponentRequest` but the uniqueness rule ignores the current comp
 
 ---
 
-## - [ ] 7. Actions
+## - [x] 7. Actions
 
 **`app/Actions/Sites/CreateSiteAction.php`**
 
@@ -351,7 +351,7 @@ Same as `StoreComponentRequest` but the uniqueness rule ignores the current comp
 
 ---
 
-## - [ ] 8. Controllers
+## - [x] 8. Controllers
 
 All controllers delegate to Actions. They are in `app/Http/Controllers/Sites/`.
 
@@ -430,7 +430,7 @@ Invokable controller for updating a component's status independently from its ot
 
 ---
 
-## - [ ] 9. Policies
+## - [x] 9. Policies
 
 **`app/Policies/SitePolicy.php`**
 
@@ -446,7 +446,7 @@ Follow the pattern from `app/Policies/SupportTicketPolicy.php`.
 
 ---
 
-## - [ ] 10. Routes
+## - [x] 10. Routes
 
 Create `routes/sites.php` and require it from `routes/web.php` (append `require __DIR__.'/sites.php';` after the existing requires).
 
@@ -476,7 +476,7 @@ Use implicit model binding scoping so that `{component}` is automatically scoped
 
 ---
 
-## - [ ] 11. TypeScript Types
+## - [x] 11. TypeScript Types
 
 **`resources/js/types/models.ts`** (create this file or extend the existing types directory)
 
@@ -507,7 +507,7 @@ The following screenshots in `art/` show exactly how the UI should look. Use the
 
 ---
 
-## - [ ] 12. Frontend Pages
+## - [x] 12. Frontend Pages
 
 All pages use the existing dashboard layout pattern (`Page.layout = (page) => <DashboardLayout>{page}</DashboardLayout>`). Use Wayfinder imports for all route references. Use shadcn components from `@/components/ui/`.
 
@@ -561,7 +561,7 @@ All pages use the existing dashboard layout pattern (`Page.layout = (page) => <D
 
 ---
 
-## - [ ] 13. Frontend Components
+## - [x] 13. Frontend Components
 
 **`resources/js/components/sites/site-card.tsx`**
 
@@ -597,7 +597,7 @@ All pages use the existing dashboard layout pattern (`Page.layout = (page) => <D
 
 ---
 
-## - [ ] 14. Tests
+## - [x] 14. Tests
 
 ### Unit Tests
 
@@ -697,7 +697,7 @@ All pages use the existing dashboard layout pattern (`Page.layout = (page) => <D
 
 ---
 
-## - [ ] 15. Data Model Diagram
+## - [x] 15. Data Model Diagram
 
 ```mermaid
 classDiagram

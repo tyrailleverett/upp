@@ -15,6 +15,7 @@ import {
 import { Label } from "@/components/ui/label";
 import AuthLayout from "@/layouts/auth-layout";
 import { privacyPolicy, termsOfService } from "@/routes";
+
 import type { SharedData } from "@/types";
 
 export default function Login() {

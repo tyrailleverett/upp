@@ -32,6 +32,7 @@ final class DatabaseSeeder extends Seeder
         $this->call([
             SubscriptionSeeder::class,
             SupportTicketSeeder::class,
+            SiteSeeder::class,
         ]);
     }
 }
