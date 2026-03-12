@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update execute-phase workflow to mark completed only, add Build Todo List step
 
+### Documentation
+
+- **verify-phase**: Add code review step to verification workflow
+
 ### Maintenance
 
 - Update configuration and commands
