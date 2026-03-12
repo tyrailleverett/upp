@@ -17,9 +17,7 @@ final class SupportTicketSubmittedMail extends Mailable implements Previewable, 
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public SupportTicket $ticket)
-    {
-    }
+    public function __construct(public SupportTicket $ticket) {}
 
     /**
      * Create a representative instance of this mailable for preview purposes.
