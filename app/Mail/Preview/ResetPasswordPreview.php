@@ -12,7 +12,9 @@ use Illuminate\Mail\Mailables\Envelope;
 
 final class ResetPasswordPreview extends Mailable implements Previewable
 {
-    public function __construct(public User $user, public string $url, public int $expireMinutes) {}
+    public function __construct(public User $user, public string $url, public int $expireMinutes)
+    {
+    }
 
     /**
      * Create a representative instance of this mailable for preview purposes.

@@ -12,6 +12,7 @@
 #   START_FROM_PHASE=2    Override auto-detection and start from a specific phase number
 #   MAX_PHASES=N          Safety cap on the number of phases to process (default: 20)
 #   OPENCODE_MODEL=model  Model to use in provider/model format (e.g. anthropic/claude-opus-4-5)
+#   AUTO_COMMIT_CHANGES=0 Disable automatic checkpoint commits before branch changes and after each phase
 
 set -euo pipefail
 
@@ -20,12 +21,17 @@ set -euo pipefail
 MAX_PHASES="${MAX_PHASES:-20}"
 START_FROM_PHASE="${START_FROM_PHASE:-}"
 OPENCODE_MODEL="${OPENCODE_MODEL:-}"
+OPENCODE_BIN="${OPENCODE_BIN:-opencode}"
+AUTO_COMMIT_CHANGES="${AUTO_COMMIT_CHANGES:-1}"
 
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SPECS_DIR="$PROJECT_ROOT/specs"
 LOG_DIR="$PROJECT_ROOT/logs/ralph"
 
 PHASES_COMPLETED=0
+OPENCODE_FLAGS=()
+LAST_PHASE_FILE=""
+LAST_PHASE_SIGNATURE=""
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -38,6 +44,78 @@ log() {
 
 log_separator() {
     log "════════════════════════════════════════════════════════════════"
+}
+
+git_worktree_has_changes() {
+    [[ -n "$(git -C "$PROJECT_ROOT" status --porcelain --untracked-files=normal)" ]]
+}
+
+is_phase_feature_branch() {
+    local branch_name="$1"
+    [[ "$branch_name" == feature/phase-* ]]
+}
+
+phase_progress_signature() {
+    local plan_file="$1"
+    shasum -a 256 "$plan_file" | awk '{print $1}'
+}
+
+auto_commit_changes() {
+    local reason="$1"
+    local current_branch
+    current_branch=$(git -C "$PROJECT_ROOT" branch --show-current)
+
+    if [[ "$AUTO_COMMIT_CHANGES" != "1" ]]; then
+        return 0
+    fi
+
+    if ! git_worktree_has_changes; then
+        return 0
+    fi
+
+    log "Auto-committing local changes on '${current_branch:-detached}' ($reason)."
+
+    git -C "$PROJECT_ROOT" add -A
+
+    if git -C "$PROJECT_ROOT" commit -m "chore(ralph-loop): checkpoint before continuing [$reason]"; then
+        log "Checkpoint commit created successfully."
+        return 0
+    fi
+
+    log "FATAL: unable to create checkpoint commit. Configure git user.name/user.email or disable auto-commit with AUTO_COMMIT_CHANGES=0."
+    return 1
+}
+
+prepare_git_workspace() {
+    local current_branch
+    current_branch=$(git -C "$PROJECT_ROOT" branch --show-current)
+
+    log "  Current branch: ${current_branch:-detached}"
+
+    auto_commit_changes "startup checkpoint" || return 1
+
+    if git_worktree_has_changes; then
+        log "Local changes detected on '${current_branch:-detached}'. Skipping checkout/pull and resuming on the current branch."
+        return 0
+    fi
+
+    if is_phase_feature_branch "$current_branch"; then
+        log "Already on Ralph phase branch '$current_branch'. Resuming there."
+        return 0
+    fi
+
+    if ! git -C "$PROJECT_ROOT" show-ref --verify --quiet refs/heads/develop; then
+        log "Branch 'develop' does not exist. Creating it from '$current_branch'..."
+        git -C "$PROJECT_ROOT" checkout -b develop
+    elif [[ "$current_branch" != "develop" ]]; then
+        log "Clean worktree on '$current_branch'. Switching to develop..."
+        git -C "$PROJECT_ROOT" checkout develop
+    fi
+
+    if git -C "$PROJECT_ROOT" remote get-url origin &>/dev/null; then
+        log "Pulling latest from origin/develop..."
+        git -C "$PROJECT_ROOT" pull --ff-only origin develop || log "Note: origin/develop may not exist yet, may require authentication, or is not a fast-forward."
+    fi
 }
 
 # Extract the phase number from a plan filename.
@@ -121,11 +199,11 @@ auto_detect_start_phase() {
 
 # Build the opencode run flags array, excluding empty optional flags.
 build_opencode_flags() {
-    local flags=()
+    OPENCODE_FLAGS=()
+
     if [[ -n "$OPENCODE_MODEL" ]]; then
-        flags+=("--model" "$OPENCODE_MODEL")
+        OPENCODE_FLAGS+=("--model" "$OPENCODE_MODEL")
     fi
-    echo "${flags[@]:-}"
 }
 
 # Invoke opencode run with a named command and the plan file as its argument.
@@ -143,22 +221,23 @@ run_opencode_step() {
     log "  [$step_name] Running opencode command: $command_name $relative_plan_file"
 
     local step_log="$phase_log.${step_name}.log"
-    local extra_flags
-    extra_flags=$(build_opencode_flags)
+    build_opencode_flags
 
     local exit_code=0
-    # shellcheck disable=SC2086
-    if ! opencode run \
+    set +e
+    (
+        cd "$PROJECT_ROOT"
+        "$OPENCODE_BIN" run \
             --command "$command_name" \
-            $extra_flags \
-            "$relative_plan_file" \
-        2>&1 | tee "$step_log"; then
-        exit_code=$?
-    fi
+            "${OPENCODE_FLAGS[@]}" \
+            "$relative_plan_file"
+    ) 2>&1 | tee "$step_log"
+    exit_code=${PIPESTATUS[0]}
+    set -e
 
     if [[ $exit_code -ne 0 ]]; then
         log "  [$step_name] FAILED (exit $exit_code). See $step_log for details."
-        return 1
+        return "$exit_code"
     fi
 
     log "  [$step_name] Completed successfully."
@@ -171,7 +250,7 @@ main() {
     mkdir -p "$LOG_DIR"
 
     log_separator
-    log "Ralph Loop starting (opencode $( opencode --version 2>/dev/null || echo 'unknown' ))"
+    log "Ralph Loop starting ($OPENCODE_BIN $( "$OPENCODE_BIN" --version 2>/dev/null || echo 'unknown' ))"
     log "  Project root : $PROJECT_ROOT"
     log "  Specs dir    : $SPECS_DIR"
     log "  MAX_PHASES   : $MAX_PHASES"
@@ -191,28 +270,9 @@ main() {
 
     log_separator
 
-    # ── Ensure we are on develop and it is clean ───────────────────────────────
+    # ── Prepare the git workspace without clobbering in-progress work ─────────
 
-    local current_branch
-    current_branch=$(git -C "$PROJECT_ROOT" branch --show-current)
-
-    # Create develop branch if it doesn't exist
-    if ! git -C "$PROJECT_ROOT" show-ref --verify --quiet refs/heads/develop; then
-        log "Branch 'develop' does not exist. Creating it from '$current_branch'..."
-        git -C "$PROJECT_ROOT" checkout -b develop
-    else
-        # Switch to develop if not already on it
-        if [[ "$current_branch" != "develop" ]]; then
-            log "Not on develop branch (currently on '$current_branch'). Switching..."
-            git -C "$PROJECT_ROOT" checkout develop
-        fi
-    fi
-
-    # Pull latest from remote if available
-    if git -C "$PROJECT_ROOT" remote get-url origin &>/dev/null; then
-        log "Pulling latest from origin/develop..."
-        git -C "$PROJECT_ROOT" pull origin develop || log "Note: origin/develop may not exist yet."
-    fi
+    prepare_git_workspace
 
     # ── Phase loop ─────────────────────────────────────────────────────────────
 
@@ -233,6 +293,16 @@ main() {
         local filename phase_num
         filename=$(basename "$plan_file")
         phase_num=$(extract_phase_num "$filename")
+
+        local phase_signature
+        phase_signature=$(phase_progress_signature "$plan_file")
+
+        if [[ "$plan_file" == "$LAST_PHASE_FILE" && "$phase_signature" == "$LAST_PHASE_SIGNATURE" ]]; then
+            log "FATAL: phase $phase_num was selected again without any plan-file progress. Stopping to avoid a loop."
+            log "  Plan file: $plan_file"
+            exit 1
+        fi
+
         # Derive a readable title by stripping prefix/suffix
         local phase_title
         phase_title=$(echo "$filename" \
@@ -247,19 +317,30 @@ main() {
         local phase_log="$LOG_DIR/phase-${phase_num}"
 
         # 1. Execute phase
-        if ! run_opencode_step "execute-phase" "execute-phase" "$plan_file" "$phase_log"; then
+        if run_opencode_step "execute-phase" "execute-phase" "$plan_file" "$phase_log"; then
+            :
+        else
+            local execute_exit_code=$?
             log "FATAL: execute-phase failed for phase $phase_num. Stopping loop."
-            exit 1
+            exit "$execute_exit_code"
         fi
 
         # 2. Verify phase
-        if ! run_opencode_step "verify-phase" "verify-phase" "$plan_file" "$phase_log"; then
+        if run_opencode_step "verify-phase" "verify-phase" "$plan_file" "$phase_log"; then
+            :
+        else
+            local verify_exit_code=$?
             log "FATAL: verify-phase failed for phase $phase_num. Stopping loop."
-            exit 1
+            exit "$verify_exit_code"
         fi
 
         PHASES_COMPLETED=$(( PHASES_COMPLETED + 1 ))
         phase_count=$(( phase_count + 1 ))
+
+        auto_commit_changes "after phase $phase_num" || exit 1
+
+        LAST_PHASE_FILE="$plan_file"
+        LAST_PHASE_SIGNATURE=$(phase_progress_signature "$plan_file")
 
         # After a phase completes, reset start_phase to 1 to allow the scanner
         # to find the true next incomplete phase for the next iteration.
