@@ -50,6 +50,12 @@ final class Site extends Model
         return $this->hasMany(Component::class);
     }
 
+    /** @return HasMany<Incident, $this> */
+    public function incidents(): HasMany
+    {
+        return $this->hasMany(Incident::class);
+    }
+
     public function isPublished(): bool
     {
         return $this->visibility === SiteVisibility::Published;
