@@ -1,5 +1,6 @@
 ---
 description: Perform a CodeRabbit-style code review of all staged and changed files. Reports inline findings with severity ratings covering security, performance, correctness, architecture, testing, Laravel SaaS conventions, and frontend (TypeScript/React/Inertia).
+model: github-copilot/gpt-5.4
 ---
 
 Perform a thorough, automated code review of all staged and changed files in the current working tree. Think like a senior Laravel SaaS engineer. Be precise, direct, and unsparing — this review exists to catch real problems before they land in main.

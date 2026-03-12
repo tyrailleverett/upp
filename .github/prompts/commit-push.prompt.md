@@ -1,5 +1,6 @@
 ---
 description: Commit changes with commitlint style and push to origin
+model: Claude Haiku 4.5 (copilot)
 ---
 
 Commit all staged and unstaged changes using conventional commit (commitlint) format and push to remote origin.

@@ -1,6 +1,6 @@
 ---
 description: Execute a phased implementation plan from specs/. Implements the entire phase using gitflow workflow, leaving changes uncommitted for verify-phase to review and push.
-subtask: true
+model: github-copilot/claude-sonnet-4.6
 ---
 
 Implement an entire phase plan end-to-end using a gitflow workflow. The plan file path is passed as `$ARGUMENTS`. All changes are left uncommitted — run verify-phase afterwards to verify, auto-fix, and push.

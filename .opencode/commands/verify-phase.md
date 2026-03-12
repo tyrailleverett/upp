@@ -1,6 +1,6 @@
 ---
 description: Verify a phase implementation by reviewing uncommitted changes, auto-fixing issues, then committing and pushing to develop. Run after execute-phase.
-subtask: true
+model: github-copilot/gpt-5.4
 ---
 
 Verify the uncommitted implementation of a phase plan. Compares working directory files against the plan specification, auto-fixes any deviations, runs tests, and pushes the result to develop once all checks pass.
