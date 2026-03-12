@@ -29,7 +29,7 @@ SPECS_DIR="$PROJECT_ROOT/specs"
 LOG_DIR="$PROJECT_ROOT/logs/ralph"
 
 PHASES_COMPLETED=0
-OPENCODE_FLAGS=()
+declare -a OPENCODE_FLAGS=()
 LAST_PHASE_FILE=""
 LAST_PHASE_SIGNATURE=""
 
@@ -227,10 +227,16 @@ run_opencode_step() {
     set +e
     (
         cd "$PROJECT_ROOT"
-        "$OPENCODE_BIN" run \
-            --command "$command_name" \
-            "${OPENCODE_FLAGS[@]}" \
-            "$relative_plan_file"
+        if (( ${#OPENCODE_FLAGS[@]} > 0 )); then
+            "$OPENCODE_BIN" run \
+                --command "$command_name" \
+                "${OPENCODE_FLAGS[@]}" \
+                "$relative_plan_file"
+        else
+            "$OPENCODE_BIN" run \
+                --command "$command_name" \
+                "$relative_plan_file"
+        fi
     ) 2>&1 | tee "$step_log"
     exit_code=${PIPESTATUS[0]}
     set -e
